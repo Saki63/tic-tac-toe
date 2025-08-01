@@ -10,38 +10,120 @@ const ticTacToeBoard = [
     null
 ];
 
+const rounds = [
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+];
+
+let roundIdx = 0;
+
 let currentPlayer = "circle";
 
 const winPatterns = [
-    [0, 1, 2], // horizontal
+    [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
 
-    [0, 3, 6], // vertikal
+    [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
 
-    [0, 4, 8], // diagonal
+    [0, 4, 8],
     [2, 4, 6]
 ];
 
 function render() {
     renderPlayer();
-    const boardElement = document.getElementById('board');
-    let html = '';
-
-    for (let i = 0; i < ticTacToeBoard.length; i++) {
-            html += `<div id="cell-${i}" class="cell" data-index="${i}" onclick="setSymbole(${i})"></div>`;
-    }
-
-    boardElement.innerHTML = html;
+    renderBoard();
     updateCurrentPlayerDisplay();
+    renderResults();
 }
 
 function renderPlayer(){
     const currentPlayerElement = document.getElementById("current-player");
     currentPlayerElement.innerHTML = `  <div id="player-circle" class="player-symbol">${getCircle()}</div>
                                         <div id="player-cross" class="player-symbol">${getCross()}</div>`;
+}
+
+function renderResults() {
+    const resultListElement = document.getElementById('results');
+
+    let html = `
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>Runde</th>
+                    <th>O</th>
+                    <th>X</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    for (let i = 0; i < 10; i++) {
+            html += `
+                    <tr id="round-${i}">
+                            <td>${i + 1}</td>
+                            <td></td>
+                            <td></td>
+                    </tr>
+            `;
+    }
+
+    html += `
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Gesamt</td>
+                    <td id="o-total"></td>
+                    <td id="x-total"></td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+
+    resultListElement.innerHTML = html;
+}
+
+function renderBoard() {
+    const boardElement = document.getElementById('board');
+    let html = '';
+
+    for (let i = 0; i < ticTacToeBoard.length; i++) {
+        html += `<div id="cell-${i}" class="cell" data-index="${i}" onclick="setSymbole(${i})"></div>`;
+    }
+
+    boardElement.innerHTML = html;
+}
+
+function setCell(index) {
+    const cellElement = document.getElementById(`cell-${index}`);
+
+    if (ticTacToeBoard[index] === 'circle') {
+        cellElement.innerHTML = getCircle();
+        cellElement.onclick = null;
+    } else if (ticTacToeBoard[index] === 'cross') {
+        cellElement.innerHTML = getCross();
+        cellElement.onclick = null;
+    }
+    else{
+        cellElement.innerHTML = "";
+        cellElement.onclick = () => setSymbole(index);
+    }
+}
+
+function resetBoard() {
+    for (let i = 0; i < ticTacToeBoard.length; i++) {
+        setCell(i);
+    }
 }
 
 function getCircle(){
@@ -64,44 +146,51 @@ function getCross() {
 function setSymbole(index) {
 
     ticTacToeBoard[index] = currentPlayer;
-    renderCell(index);
+    setCell(index);
     if (!checkGameOver()) {
         currentPlayer = currentPlayer === 'circle' ? 'cross' : 'circle';
         updateCurrentPlayerDisplay();
     }
 }
 
-function renderCell(index) {
-    const cellElement = document.getElementById(`cell-${index}`);
+function checkGameOver() {
+    let end = checkWinner();
 
-    if (ticTacToeBoard[index] === 'circle') {
-        cellElement.innerHTML = getCircle();
-    } else if (ticTacToeBoard[index] === 'cross') {
-        cellElement.innerHTML = getCross();
+    if (!end){
+        end = checkEqual();
     }
-    
-    cellElement.onclick = null;
+    end = checkFinalGameEnd();
+
+    return end;
 }
 
-function checkGameOver() {
+function checkWinner(){
     for (const [a, b, c] of winPatterns) {
         if (
             ticTacToeBoard[a] &&
             ticTacToeBoard[a] === ticTacToeBoard[b] &&
             ticTacToeBoard[a] === ticTacToeBoard[c]
         ) {
-            drawWinLine(a, b, c);  // Strich zeichnen
-            blockBoard();          // Keine weiteren Züge möglich
+            drawWinLine(a, b, c);
+            blockBoard();
+            rounds[roundIdx] = currentPlayer;
+            updateResultRow(roundIdx);
+            roundIdx++;
+            document.getElementById("next-button").disabled = false;
             return true;
         }
     }
+    return false;
+}
 
-    // Unentschieden: alle Felder belegt
+function checkEqual(){
     if (!ticTacToeBoard.includes(null)) {
-        // alert("Unentschieden!");
+        rounds[roundIdx] = "-";
+        updateResultRow(roundIdx);
+        roundIdx++;
+        document.getElementById("next-button").disabled = false;
         return true;
     }
-
     return false;
 }
 
@@ -117,7 +206,6 @@ function blockBoard() {
 function drawWinLine(a, b, c) {
     const line = document.getElementById('win-line');
 
-    // Position der Zellen im Grid
     const positions = {
         0: [0, 0], 1: [1, 0], 2: [2, 0],
         3: [0, 1], 4: [1, 1], 5: [2, 1],
@@ -145,23 +233,21 @@ function drawWinLine(a, b, c) {
     line.style.transform = `translate(${xStart}px, ${yStart}px) rotate(${angle}deg)`;
 }
 
-function restartGame() {
-    // Reset der Spielvariablen
+function nextRound() {
     for (let i = 0; i < ticTacToeBoard.length; i++) {
         ticTacToeBoard[i] = null;
     }
-
+    
     currentPlayer = Math.random() < 0.5 ? "circle" : "cross";
     updateCurrentPlayerDisplay();
 
-    // Gewinnlinie ausblenden
     const line = document.getElementById('win-line');
     if (line) {
         line.style.display = 'none';
     }
 
-    // Spielfeld neu aufbauen
-    render();
+    resetBoard();
+    document.getElementById("next-button").disabled = true;
 }
 
 function updateCurrentPlayerDisplay() {
@@ -175,4 +261,53 @@ function updateCurrentPlayerDisplay() {
         crossEl.classList.add('active');
         circleEl.classList.remove('active');
     }
+}
+
+function updateResultRow(index) {
+    const round = rounds[index];
+
+    const row = document.getElementById(`round-${index}`);
+
+    const xCell = row.children[2];
+    const oCell = row.children[1];
+
+    xCell.textContent = '';
+    oCell.textContent = '';
+
+    if (round === 'cross') {
+        xCell.textContent = '✔';
+    } else if (round === 'circle') {
+        oCell.textContent = '✔';
+    } else if (round === '-') {
+        xCell.textContent = '-';
+        oCell.textContent = '-';
+    }
+}
+
+function checkFinalGameEnd() {
+    if (roundIdx >= 10) {
+        let xWins = 0;
+        let oWins = 0;
+
+        for (const result of rounds) {
+            if (result === 'cross') {
+                xWins++;
+            } else if (result === 'circle') {
+                oWins++;
+            }
+        }
+
+        // Zeige die Nachricht an (z. B. in einem div oder alert)
+        updateTotalRow(xWins, oWins); // Oder z. B.: document.getElementById("end-message").innerText = message;
+
+        // Optional: Spiel blockieren oder "Neustart"-Button anzeigen
+        document.getElementById("next-button").disabled = true;
+        return true;
+    }
+    return false;
+}
+
+function updateTotalRow(xWins, oWins) {
+    document.getElementById('o-total').innerText = oWins;
+    document.getElementById('x-total').innerText = xWins;
 }
