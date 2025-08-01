@@ -1,4 +1,4 @@
-const ticTacToeBoard = [
+const BOARD = [
     null,
     null,
     null,
@@ -10,7 +10,7 @@ const ticTacToeBoard = [
     null
 ];
 
-const rounds = [
+const ROUNDS = [
   null,
   null,
   null,
@@ -23,11 +23,11 @@ const rounds = [
   null
 ];
 
-let roundIdx = 0;
+let CURRENTROUND = 0;
 
-let currentPlayer = "circle";
+let CURRENTPLAYER = "circle";
 
-const winPatterns = [
+const WINPATTERNS = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -49,8 +49,7 @@ function render() {
 
 function renderPlayer(){
     const currentPlayerElement = document.getElementById("current-player");
-    currentPlayerElement.innerHTML = `  <div id="player-circle" class="player-symbol">${getCircle()}</div>
-                                        <div id="player-cross" class="player-symbol">${getCross()}</div>`;
+    currentPlayerElement.innerHTML = displayCurrentPlayerTemplate();
 }
 
 function renderResults() {
@@ -97,58 +96,42 @@ function renderBoard() {
     const boardElement = document.getElementById('board');
     let html = '';
 
-    for (let i = 0; i < ticTacToeBoard.length; i++) {
-        html += `<div id="cell-${i}" class="cell" data-index="${i}" onclick="setSymbole(${i})"></div>`;
+    for (let cellIdx = 0; cellIdx < BOARD.length; cellIdx++) {
+        html += getBoardCellTemplate(cellIdx);
     }
 
     boardElement.innerHTML = html;
 }
 
-function setCell(index) {
-    const cellElement = document.getElementById(`cell-${index}`);
+function setCell(cellIdx) {
+    const cellElement = document.getElementById(`cell-${cellIdx}`);
 
-    if (ticTacToeBoard[index] === 'circle') {
-        cellElement.innerHTML = getCircle();
+    if (BOARD[cellIdx] === 'circle') {
+        cellElement.innerHTML = getCircleSVG();
         cellElement.onclick = null;
-    } else if (ticTacToeBoard[index] === 'cross') {
-        cellElement.innerHTML = getCross();
+    } else if (BOARD[cellIdx] === 'cross') {
+        cellElement.innerHTML = getCrossSVG();
         cellElement.onclick = null;
     }
     else{
         cellElement.innerHTML = "";
-        cellElement.onclick = () => setSymbole(index);
+        cellElement.onclick = () => setSymbole(cellIdx);
     }
 }
 
 function resetBoard() {
-    for (let i = 0; i < ticTacToeBoard.length; i++) {
-        setCell(i);
+    for (let cellIdx = 0; cellIdx < BOARD.length; cellIdx++) {
+        BOARD[cellIdx] = null;
+        setCell(cellIdx);
     }
-}
-
-function getCircle(){
-    return `
-            <svg width="70" height="70" viewBox="0 0 100 100">
-            <circle class="circle-animate" cx="50" cy="50" r="40" stroke="#04b504" stroke-width="10" fill="none" />
-            </svg>
-            `;
-}
-
-function getCross() {
-    return `
-        <svg width="70" height="70" viewBox="0 0 100 100">
-            <line class="cross-line cross-line1" x1="20" y1="20" x2="80" y2="80" />
-            <line class="cross-line cross-line2" x1="80" y1="20" x2="20" y2="80" />
-        </svg>
-    `;
 }
 
 function setSymbole(index) {
 
-    ticTacToeBoard[index] = currentPlayer;
+    BOARD[index] = CURRENTPLAYER;
     setCell(index);
     if (!checkGameOver()) {
-        currentPlayer = currentPlayer === 'circle' ? 'cross' : 'circle';
+        CURRENTPLAYER = CURRENTPLAYER === 'circle' ? 'cross' : 'circle';
         updateCurrentPlayerDisplay();
     }
 }
@@ -165,17 +148,17 @@ function checkGameOver() {
 }
 
 function checkWinner(){
-    for (const [a, b, c] of winPatterns) {
+    for (const [a, b, c] of WINPATTERNS) {
         if (
-            ticTacToeBoard[a] &&
-            ticTacToeBoard[a] === ticTacToeBoard[b] &&
-            ticTacToeBoard[a] === ticTacToeBoard[c]
+            BOARD[a] &&
+            BOARD[a] === BOARD[b] &&
+            BOARD[a] === BOARD[c]
         ) {
-            drawWinLine(a, b, c);
+            drawWinLine(a, c);
             blockBoard();
-            rounds[roundIdx] = currentPlayer;
-            updateResultRow(roundIdx);
-            roundIdx++;
+            ROUNDS[CURRENTROUND] = CURRENTPLAYER;
+            updateResultRow(CURRENTROUND);
+            CURRENTROUND++;
             document.getElementById("next-button").disabled = false;
             return true;
         }
@@ -184,10 +167,10 @@ function checkWinner(){
 }
 
 function checkEqual(){
-    if (!ticTacToeBoard.includes(null)) {
-        rounds[roundIdx] = "-";
-        updateResultRow(roundIdx);
-        roundIdx++;
+    if (!BOARD.includes(null)) {
+        ROUNDS[CURRENTROUND] = "-";
+        updateResultRow(CURRENTROUND);
+        CURRENTROUND++;
         document.getElementById("next-button").disabled = false;
         return true;
     }
@@ -195,15 +178,15 @@ function checkEqual(){
 }
 
 function blockBoard() {
-    for (let i = 0; i < ticTacToeBoard.length; i++) {
-        const cell = document.getElementById(`cell-${i}`);
+    for (let cellIdx = 0; cellIdx < BOARD.length; cellIdx++) {
+        const cell = document.getElementById(`cell-${cellIdx}`);
         if (cell) {
             cell.onclick = null;
         }
     }
 }
 
-function drawWinLine(a, b, c) {
+function drawWinLine(a, c) {
     const line = document.getElementById('win-line');
 
     const positions = {
@@ -234,17 +217,11 @@ function drawWinLine(a, b, c) {
 }
 
 function nextRound() {
-    for (let i = 0; i < ticTacToeBoard.length; i++) {
-        ticTacToeBoard[i] = null;
-    }
     
-    currentPlayer = Math.random() < 0.5 ? "circle" : "cross";
+    CURRENTPLAYER = Math.random() < 0.5 ? "circle" : "cross";
     updateCurrentPlayerDisplay();
 
-    const line = document.getElementById('win-line');
-    if (line) {
-        line.style.display = 'none';
-    }
+    deleteWinLine();
 
     resetBoard();
     document.getElementById("next-button").disabled = true;
@@ -254,7 +231,7 @@ function updateCurrentPlayerDisplay() {
     const circleEl = document.getElementById('player-circle');
     const crossEl = document.getElementById('player-cross');
 
-    if (currentPlayer === 'circle') {
+    if (CURRENTPLAYER === 'circle') {
         circleEl.classList.add('active');
         crossEl.classList.remove('active');
     } else {
@@ -264,7 +241,7 @@ function updateCurrentPlayerDisplay() {
 }
 
 function updateResultRow(index) {
-    const round = rounds[index];
+    const round = ROUNDS[index];
 
     const row = document.getElementById(`round-${index}`);
 
@@ -285,22 +262,18 @@ function updateResultRow(index) {
 }
 
 function checkFinalGameEnd() {
-    if (roundIdx >= 10) {
+    if (CURRENTROUND >= 10) {
         let xWins = 0;
         let oWins = 0;
 
-        for (const result of rounds) {
+        for (const result of ROUNDS) {
             if (result === 'cross') {
                 xWins++;
             } else if (result === 'circle') {
                 oWins++;
             }
         }
-
-        // Zeige die Nachricht an (z. B. in einem div oder alert)
-        updateTotalRow(xWins, oWins); // Oder z. B.: document.getElementById("end-message").innerText = message;
-
-        // Optional: Spiel blockieren oder "Neustart"-Button anzeigen
+        updateTotalRow(xWins, oWins);
         document.getElementById("next-button").disabled = true;
         return true;
     }
@@ -310,4 +283,28 @@ function checkFinalGameEnd() {
 function updateTotalRow(xWins, oWins) {
     document.getElementById('o-total').innerText = oWins;
     document.getElementById('x-total').innerText = xWins;
+}
+
+function restartGame(){
+    resetBoard();
+    resetResultList();
+    updateTotalRow("", "");
+    CURRENTROUND = 0;
+    
+    CURRENTPLAYER = Math.random() < 0.5 ? "circle" : "cross";
+    deleteWinLine();
+}
+
+function deleteWinLine(){
+    const line = document.getElementById('win-line');
+    if (line) {
+        line.style.display = 'none';
+    }    
+}
+
+function resetResultList(){
+    for (let roundIdx = 0; roundIdx < ROUNDS.length; roundIdx++) {
+        ROUNDS[roundIdx] = null;
+        updateResultRow(roundIdx);
+    }
 }
