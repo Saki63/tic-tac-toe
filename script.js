@@ -308,3 +308,11 @@ function resetResultList(){
         updateResultRow(roundIdx);
     }
 }
+
+function closeMediaWindow() {
+    document.getElementById('game-info').style.display = 'none';
+}
+
+function stopBubbling(event){
+    event.stopPropagation();
+}

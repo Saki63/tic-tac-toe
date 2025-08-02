@@ -22,10 +22,12 @@
             </div>
             <button onclick="nextRound()" id="next-button" disabled>Next Round</button>
         </div>
-        <div class="game-info">
-            <div id="results"></div>  
-            <button onclick="restartGame()" id="restart-button">Reset</button>
-            
+        <div id="game-info" class="game-info" onclick="closeMediaWindow()">
+            <div id="info-content" class="info-content" onclick="stopBubbling(event)">
+                <div id="results"></div>  
+                <button onclick="restartGame()" id="restart-button">Reset</button>                
+            </div>
+
         </div>
 
     </div>

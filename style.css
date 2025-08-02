@@ -162,3 +162,40 @@ button:disabled{
     align-items: center;
     gap: 20px;
 }
+
+.d-none{
+    display: none !important;
+}
+
+.overlayer{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(255, 255, 255, 0.348);
+}
+
+.info-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media(max-width: 570px){
+    .game-info{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100vw;
+        background-color: rgba(255, 255, 255, 0.758);
+    }
+
+    .result-table{
+        background-color: rgb(176, 176, 176);
+    }
+}
