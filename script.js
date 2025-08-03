@@ -69,7 +69,7 @@ function renderResults(id, addition) {
         <table class="result-table">
             <thead>
                 <tr>
-                    <th>Runde</th>
+                    <th>Round</th>
                     <th>O</th>
                     <th>X</th>
                 </tr>
@@ -91,7 +91,7 @@ function renderResults(id, addition) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td>Gesamt</td>
+                    <td>Total</td>
                     <td id="o-total${addition}"></td>
                     <td id="x-total${addition}"></td>
                 </tr>
