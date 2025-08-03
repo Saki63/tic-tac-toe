@@ -46,7 +46,7 @@ h1{
 }
 
 .circle-animate {
-    stroke-dasharray: 251.2; /* Umfang = 2πr = 2 * π * 40 ≈ 251.2 */
+    stroke-dasharray: 251.2;
     stroke-dashoffset: 251.2;
     animation: drawCircle 0.4s ease-out forwards;
 }
@@ -61,7 +61,7 @@ h1{
     stroke: #ff8400;
     stroke-width: 10;
     stroke-linecap: round;
-    stroke-dasharray: 84; /* Länge der Linie: sqrt(60² + 60²) ≈ 84.85 */
+    stroke-dasharray: 84;
     stroke-dashoffset: 84;
     animation: drawLine 0.3s ease-out forwards;
 }
