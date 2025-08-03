@@ -325,7 +325,8 @@ function resetResultList(){
 }
 
 function closeMediaWindow() {
-    document.getElementById('game-info-overlayer').style.display = 'none';
+    document.getElementById('game-info-overlayer').classList.replace("game-info-overlayer-open", "game-info-overlayer-closed");
+    document.getElementById("main-content").classList.toggle("main-content-not-scrollable");
 }
 
 function stopBubbling(event){
@@ -333,5 +334,6 @@ function stopBubbling(event){
 }
 
 function openGameResults() {
-    document.getElementById("game-info-overlayer").style.display = "flex";
+    document.getElementById("game-info-overlayer").classList.replace("game-info-overlayer-closed", "game-info-overlayer-open");
+    document.getElementById("main-content").classList.toggle("main-content-not-scrollable");
 }

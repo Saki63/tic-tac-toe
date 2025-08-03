@@ -11,7 +11,8 @@
 <body onload="render()">
     <h1>Tic-Tac-Toe</h1>
 
-    <div class="main-content">
+    <div id="main-content" class="main-content">
+        
         <div class="board-game">
             <div id="current-player">
             </div>            
@@ -29,13 +30,12 @@
         <div id="game-info" class="game-info" onclick="closeMediaWindow()">
             <div class="info-content" onclick="stopBubbling(event)">
                 <div id="results"></div>
-
                 <button onclick="restartGame()" id="restart-button">Reset</button>           
             </div>
         </div>
     </div>
 
-    <div id="game-info-overlayer" class="game-info-overlayer" onclick="closeMediaWindow()">
+    <div id="game-info-overlayer" class="game-info-overlayer game-info-overlayer-closed" onclick="closeMediaWindow()">
         <div class="info-content" onclick="stopBubbling(event)">
             <div id="results-resp"></div>  
             <button onclick="restartGame()" id="restart-button">Reset</button>                
