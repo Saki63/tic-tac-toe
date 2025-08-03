@@ -20,18 +20,27 @@
                 <div id="board"></div>
                 <div id="win-line"></div>
             </div>
-            <button onclick="nextRound()" id="next-button" disabled>Next Round</button>
-        </div>
-        <div id="game-info" class="game-info" onclick="closeMediaWindow()">
-            <div id="info-content" class="info-content" onclick="stopBubbling(event)">
-                <div id="results"></div>  
-                <button onclick="restartGame()" id="restart-button">Reset</button>                
+            <div>
+                <button onclick="nextRound()" id="next-button" disabled>Next Round</button>
+                <button onclick="openGameResults()" id="open-results-button">Game Results</button>                 
             </div>
 
         </div>
+        <div id="game-info" class="game-info" onclick="closeMediaWindow()">
+            <div class="info-content" onclick="stopBubbling(event)">
+                <div id="results"></div>
 
+                <button onclick="restartGame()" id="restart-button">Reset</button>           
+            </div>
+        </div>
     </div>
 
+    <div id="game-info-overlayer" class="game-info-overlayer" onclick="closeMediaWindow()">
+        <div class="info-content" onclick="stopBubbling(event)">
+            <div id="results-resp"></div>  
+            <button onclick="restartGame()" id="restart-button">Reset</button>                
+        </div>
+    </div>
 
 
 </body>

@@ -44,7 +44,8 @@ function render() {
     renderPlayer();
     renderBoard();
     updateCurrentPlayerDisplay();
-    renderResults();
+    renderResults('results', '');
+    renderResults('results-resp', '-resp');
 }
 
 function renderPlayer(){
@@ -52,8 +53,17 @@ function renderPlayer(){
     currentPlayerElement.innerHTML = displayCurrentPlayerTemplate();
 }
 
-function renderResults() {
-    const resultListElement = document.getElementById('results');
+function checkResp() {
+    const resultElement = document.getElementById('results');
+    if (resultElement && resultElement.style.display === 'none') {
+        return document.getElementById('results-resp');
+    } else {
+        return resultElement;
+    }
+}
+
+function renderResults(id, addition) {
+    const resultListElement = document.getElementById(id);
 
     let html = `
         <table class="result-table">
@@ -69,7 +79,7 @@ function renderResults() {
 
     for (let i = 0; i < 10; i++) {
             html += `
-                    <tr id="round-${i}">
+                    <tr id="round${addition}-${i}">
                             <td>${i + 1}</td>
                             <td></td>
                             <td></td>
@@ -82,8 +92,8 @@ function renderResults() {
             <tfoot>
                 <tr>
                     <td>Gesamt</td>
-                    <td id="o-total"></td>
-                    <td id="x-total"></td>
+                    <td id="o-total${addition}"></td>
+                    <td id="x-total${addition}"></td>
                 </tr>
             </tfoot>
         </table>
@@ -241,24 +251,26 @@ function updateCurrentPlayerDisplay() {
 }
 
 function updateResultRow(index) {
-    const round = ROUNDS[index];
+    ['','-resp'].forEach(suffix => {
+        const row = document.getElementById(`round${suffix}-${index}`);
+        if (!row) return;
 
-    const row = document.getElementById(`round-${index}`);
+        const xCell = row.children[2];
+        const oCell = row.children[1];
 
-    const xCell = row.children[2];
-    const oCell = row.children[1];
+        xCell.textContent = '';
+        oCell.textContent = '';
 
-    xCell.textContent = '';
-    oCell.textContent = '';
-
-    if (round === 'cross') {
-        xCell.textContent = '✔';
-    } else if (round === 'circle') {
-        oCell.textContent = '✔';
-    } else if (round === '-') {
-        xCell.textContent = '-';
-        oCell.textContent = '-';
-    }
+        const round = ROUNDS[index];
+        if (round === 'cross') {
+            xCell.textContent = '✔';
+        } else if (round === 'circle') {
+            oCell.textContent = '✔';
+        } else if (round === '-') {
+            xCell.textContent = '-';
+            oCell.textContent = '-';
+        }
+    });
 }
 
 function checkFinalGameEnd() {
@@ -281,8 +293,10 @@ function checkFinalGameEnd() {
 }
 
 function updateTotalRow(xWins, oWins) {
-    document.getElementById('o-total').innerText = oWins;
-    document.getElementById('x-total').innerText = xWins;
+    ['','-resp'].forEach(suffix => {
+        document.getElementById(`o-total${suffix}`).innerText = oWins;
+        document.getElementById(`x-total${suffix}`).innerText = xWins;
+    });
 }
 
 function restartGame(){
@@ -293,6 +307,7 @@ function restartGame(){
     
     CURRENTPLAYER = Math.random() < 0.5 ? "circle" : "cross";
     deleteWinLine();
+    document.getElementById("next-button").disabled = true;
 }
 
 function deleteWinLine(){
@@ -310,9 +325,13 @@ function resetResultList(){
 }
 
 function closeMediaWindow() {
-    document.getElementById('game-info').style.display = 'none';
+    document.getElementById('game-info-overlayer').style.display = 'none';
 }
 
 function stopBubbling(event){
     event.stopPropagation();
+}
+
+function openGameResults() {
+    document.getElementById("game-info-overlayer").style.display = "flex";
 }

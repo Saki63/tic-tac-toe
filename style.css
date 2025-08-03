@@ -182,9 +182,21 @@ button:disabled{
     align-items: center;
 }
 
+.game-info-overlayer{
+    display: none;
+}
+
+#open-results-button{
+    display: none;
+}
+
 @media(max-width: 570px){
     .game-info{
-        display: flex;
+        display: none;
+    }
+
+    .game-info-overlayer{
+        display: none;
         align-items: center;
         justify-content: center;
         position: absolute;
@@ -197,5 +209,9 @@ button:disabled{
 
     .result-table{
         background-color: rgb(176, 176, 176);
+    }
+
+    #open-results-button{
+        display: inline-block;
     }
 }
